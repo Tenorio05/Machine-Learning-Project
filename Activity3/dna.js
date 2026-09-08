@@ -13,7 +13,7 @@ class DNA {
     } else {
       // The genetic sequence
       // DNA is random floating point values between 0 and 1 (!!)
-      this.genes = new Array(1);
+      this.genes = new Array(2);
       for (let i = 0; i < this.genes.length; i++) {
         this.genes[i] = random(0, 1);
       }

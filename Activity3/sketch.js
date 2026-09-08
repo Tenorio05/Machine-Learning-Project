@@ -13,7 +13,7 @@
 let world;
 
 function setup() {
-  createCanvas(640, 360);
+  createCanvas(960, 540);
   // World starts with 20 creatures
   // and 20 pieces of food
   world = new World(20);

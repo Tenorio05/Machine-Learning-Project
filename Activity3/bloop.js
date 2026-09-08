@@ -14,10 +14,11 @@ class Bloop {
     this.xoff = random(1000); // For perlin noise
     this.yoff = random(1000);
     this.dna = dna_; // DNA
-    // DNA will determine size and maxspeed
+    // DNA will determine size, maxspeed and visionrange
     // The bigger the bloop, the slower it is
     this.maxspeed = map(this.dna.genes[0], 0, 1, 15, 0);
     this.r = map(this.dna.genes[0], 0, 1, 0, 50);
+    this.visionrange = map(this.dna.genes[1], 0, 1, this.r, this.r * 2);
   }
 
   run() {
@@ -80,6 +81,9 @@ class Bloop {
   // Method to display
   display() {
     ellipseMode(CENTER);
+    noStroke();
+    fill(0, 255, 0, this.health);
+    ellipse(this.position.x, this.position.y, this.visionrange, this.visionrange);
     stroke(0, this.health);
     fill(0, this.health);
     ellipse(this.position.x, this.position.y, this.r, this.r);
