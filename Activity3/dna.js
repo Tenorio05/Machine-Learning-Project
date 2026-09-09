@@ -38,4 +38,13 @@ class DNA {
       }
     }
   }
+
+  crossover(partner) {
+    let childgenes = [];
+    for (let i = 0; i < this.genes.length; i++) {
+      if (random(1) < 0.5) childgenes.push(this.genes[i]);
+      else childgenes.push(partner.genes[i]);
+    }
+    return new DNA(childgenes);
+  }
 }

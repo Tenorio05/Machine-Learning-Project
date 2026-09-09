@@ -33,11 +33,12 @@ class Bloop {
   eat(f) {
     let food = f.getFood();
     this.isseeking = false;
+    let foodLocation, d;
 
     // Are we touching any food objects?
     for (let i = food.length - 1; i >= 0; i--) {
-      let foodLocation = food[i];
-      let d = p5.Vector.dist(this.position, foodLocation);
+      foodLocation = food[i];
+      d = p5.Vector.dist(this.position, foodLocation);
 
       // If we are, juice up our strength!
       if (d < this.r / 2) {
@@ -57,17 +58,31 @@ class Bloop {
     this.velocity.lerp(force, 0.1);
   }
 
-  // At any moment there is a teeny, tiny chance a bloop will reproduce
-  reproduce() {
-    // asexual reproduction
-    if (random(1) < 0.0005) {
-      // Child is exact copy of single parent
-      let childDNA = this.dna.copy();
-      // Child DNA can mutate
-      childDNA.mutate(0.01);
-      return new Bloop(this.position, childDNA);
-    } else {
-      return null;
+  // If two bloops see each other, there is a teeny, tiny chance they will reproduce
+  reproduce(bloops) {
+    let d, other;
+    let childDNA;
+    let midpoint;
+
+    // checking the distance between all bloops
+    for (let i = 0; i < bloops.length; i++) {
+      other = bloops[i];
+      d = p5.Vector.dist(this.position, other.position);
+      if (d > 0 && d < this.visionrange/2 + other.r/2) {
+
+        // sexual reproduction
+        if (random(1) < 0.001) {
+          // Child is crossover between both bloops
+          childDNA = this.dna.crossover(other.dna);
+          // Child DNA can mutate
+          childDNA.mutate(0.01);
+          midpoint = p5.Vector.lerp(this.position, other.position, 0.5);
+          return new Bloop(midpoint, childDNA);
+        } else {
+          return null;
+        }
+
+      }
     }
   }
 
