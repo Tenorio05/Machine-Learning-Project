@@ -10,6 +10,7 @@
 class Bloop {
   constructor(l, dna_) {
     this.position = l.copy(); // Location
+    this.velocity = createVector(0, 0);
     this.health = 200; // Life timer
     this.xoff = random(1000); // For perlin noise
     this.yoff = random(1000);
@@ -19,6 +20,7 @@ class Bloop {
     this.maxspeed = map(this.dna.genes[0], 0, 1, 15, 0);
     this.r = map(this.dna.genes[0], 0, 1, 0, 50);
     this.visionrange = map(this.dna.genes[1], 0, 1, this.r, this.r * 2);
+    this.isseeking = false;
   }
 
   run() {
@@ -30,16 +32,29 @@ class Bloop {
   // A bloop can find food and eat it
   eat(f) {
     let food = f.getFood();
+    this.isseeking = false;
+
     // Are we touching any food objects?
     for (let i = food.length - 1; i >= 0; i--) {
       let foodLocation = food[i];
       let d = p5.Vector.dist(this.position, foodLocation);
+
       // If we are, juice up our strength!
       if (d < this.r / 2) {
         this.health += 100;
         food.splice(i, 1);
+      } else if (d <= this.visionrange / 2) {
+        this.seek(foodLocation);
+        this.isseeking = true;
       }
     }
+  }
+
+  // Seek moviment based on Activity 2
+  seek(target) {
+    let force = p5.Vector.sub(target, this.position);
+    force.setMag(this.maxspeed);
+    this.velocity.lerp(force, 0.1);
   }
 
   // At any moment there is a teeny, tiny chance a bloop will reproduce
@@ -58,16 +73,17 @@ class Bloop {
 
   // Method to update position
   update() {
-    // Simple movement based on perlin noise
-    let vx = map(noise(this.xoff), 0, 1, -this.maxspeed, this.maxspeed);
-    let vy = map(noise(this.yoff), 0, 1, -this.maxspeed, this.maxspeed);
-    let velocity = createVector(vx, vy);
+    if (!this.isseeking) {
+      // Simple movement based on perlin noise
+      let vx = map(noise(this.xoff), 0, 1, -this.maxspeed, this.maxspeed);
+      let vy = map(noise(this.yoff), 0, 1, -this.maxspeed, this.maxspeed);
+      this.velocity = createVector(vx, vy);
+    }
+
+    this.position.add(this.velocity);
     this.xoff += 0.01;
     this.yoff += 0.01;
-
-    this.position.add(velocity);
-    // Death always looming
-    this.health -= 0.2;
+    this.health -= 0.2; // Death always looming
   }
 
   // Wraparound
